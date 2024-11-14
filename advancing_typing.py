@@ -3,6 +3,7 @@ from typing import List, Set, Dict, Tuple, Any, Final, Iterable, Sequence, Calla
 from sys import getsizeof
 
 print("\n ADVANCING TYPING")
+print("\n ADVANCING TYPING")
 
 people: List[str] = ['Mario', 'Luigi']
 coordinates: Tuple[int, str] = (1, 'Max')
