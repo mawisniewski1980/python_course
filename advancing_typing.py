@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List, Set, Dict, Tuple, Any, Final, Iterable, Sequence, Callable, Protocol, TypedDict, NotRequired, Required
+from typing import List, Literal, Set, Dict, Tuple, Any, Final, Iterable, Sequence, Callable, Protocol, TypedDict, Required, NotRequired, Generator, Iterator
 from sys import getsizeof
 
 print("\n ADVANCING TYPING")
@@ -105,8 +105,7 @@ def silent_print(text: str) -> None:
 print_it("hello", loud_print)
 print_it("hello", silent_print)
 
-
-print("\n PROTOCOLS") # define the structure of what a class should like  INTERFACE in JAVA
+print("\n PROTOCOLS")  # define the structure of what a class should like  INTERFACE in JAVA
 
 
 class Printer(Protocol):
@@ -153,10 +152,10 @@ def print_magazine(printer: Printer, magazine: str) -> None:
     printer.copy(magazine, 5)
     print('Shutting down printer...')
 
+
 print_magazine(lp, 'Python Times')
 print()
 print_magazine(lpi, 'Geeks of Python')
-
 
 print("\n TYPEDDICT")
 
@@ -166,3 +165,146 @@ class Coordinate(TypedDict):
     y: float
     label: str
     category: NotRequired[str]
+
+
+coordinate1: Coordinate = {'x': 20, 'y': 10, 'label': 'Profit'}
+coordinate2: Coordinate = {'x': 20, 'y': 10, 'label': 'Profit', 'category': 'Finance'}
+
+Vote = TypedDict('Vote', {'for': int, 'against': int}, total=False)
+
+vote1: Vote = {'for': 100}
+vote2: Vote = {'for': 100, 'against': 200}
+vote3: Vote = {'against': 200}
+
+Vote2 = TypedDict('Vote',
+                  {'for': int,
+                   'against': int,
+                   'topic': Required[str]},
+                  total=False)
+
+vote4: Vote2 = {'for': 100, 'against': 200, 'topic': 'More money'}
+vote5: Vote2 = {'topic': 'More money'}
+
+print(vote1)
+print(vote2)
+print(vote3)
+print(vote4)
+print(vote5)
+
+from typing import Literal, TypeAlias, Callable, NewType, Self
+
+print("\n LITERALS")
+
+Mode = Literal['r', 'w', 'a']
+
+
+def read_file(file: str, mode: Mode) -> None:
+    print(f'Reading {file} in "{mode}" mode.')
+
+
+read_file('xx.txt', 'r')
+read_file('xx.txt', 'w')
+read_file('xx.txt', 'a')
+read_file('xx.txt', 'Z')
+
+print("\n TYPE ALIAS")
+
+OptionalStr: TypeAlias = str | None
+Mode: TypeAlias = Literal['r', 'w', 'a']
+Printer: TypeAlias = Callable[[str], str]
+
+
+def func(text: OptionalStr):
+    ...
+
+
+FruitType: TypeAlias = 'Fruit'
+
+
+class Fruit:
+    def __init__(self, name: str) -> None:
+        self.name = name
+
+    def fruit_method(self) -> FruitType:
+        return self
+
+
+orange: Fruit = Fruit('orange')
+orange.fruit_method()
+
+print("\n NEW TYPE")
+
+UserId = NewType('UserId', int)
+
+
+def get_user(userid: UserId) -> str | None:
+    users: dict = {0: 'Mario', 1: 'James', 2: 'Luigi'}
+    return users.get(userid)
+
+
+print(get_user(0))
+print(get_user(False))
+print(get_user(UserId(0)))
+print(0 == UserId(0))
+
+print("\n SELF")
+
+
+class File:
+    def __init__(self, filepath: str) -> None:
+        self.filepath = filepath
+
+    @classmethod
+    def create_file(cls, name: str, ext: str) -> Self:
+        return cls(f'{name}.{ext}')
+
+    def __enter__(self) -> Self:
+        print(f'Opening "{self.filepath}"')
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        print(f'Closing "{self.filepath}"...')
+
+
+file: File = File.create_file('cat', 'jpg')
+print(file.filepath)
+
+with File('cat.jpg') as file:
+    print(file.filepath)
+
+
+class JPEG(File):
+    def jpeg_method(self) -> Self:
+        print('Doing something jpeg releated...')
+        return self
+
+
+jpeg: JPEG = JPEG.create_file('dog', 'png')
+jpeg.jpeg_method()
+
+print("\n GENERATORS")
+
+
+def generate() -> Generator[int, int, str]:
+    for i in range(3):
+        yield i
+
+    return 'SOME_VALUE'
+
+
+numbers: Generator[int, int, str] = generate()
+print(next(numbers))
+print(numbers.send(10))
+print(next(numbers))
+
+
+def generate2() -> Iterator[int]:
+    for i in range(3):
+        yield i
+
+
+numbers2: Iterator[int] = generate2()
+print(next(numbers2))
+print(next(numbers2))
+print(next(numbers2))
+print(next(numbers2))
